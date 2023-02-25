@@ -14,6 +14,12 @@ function Difficulty(props) {
 
   const handleKeyDown = (event) => {
     if (event.keyCode === 32 && currentInput.trim() !== '') {
+			if(elements.length >= props.maxElements){
+				console.log("max number of elements reached");
+				setCurrentInput('');
+				return;
+			}
+			
       const nextElementNumber = elements.length + 1;
 			try{
 				const p = calculatePoints(currentInput.trim());
@@ -23,15 +29,20 @@ function Difficulty(props) {
 				setCurrentInput('');
 			} catch(e) {
 				//TODO better exception handling
-				
 				console.log(e);
 			}
 			
     }
   };
     return (
-			<div>
-				<input type="text" value={currentInput} onChange={handleInput} onKeyDown={handleKeyDown} />
+			<div className='col'>
+				<input
+					type="text"
+					value={currentInput}
+					onChange={handleInput}
+					onKeyDown={handleKeyDown}
+					style={{ width: '80px' }}
+				/>
 				{elements.map((element, index) => (
 					<Element
 						key={index}
