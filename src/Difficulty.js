@@ -20,13 +20,15 @@ function Difficulty(props) {
 				return;
 			}
 			
-      const nextElementNumber = elements.length + 1;
 			try{
 				const p = calculatePoints(currentInput.trim());
-				const newElement = currentInput.trim();
-				setElements([...elements, newElement]);
-				setPoints([...points, p]);
+				const newElements = [...elements, currentInput.trim()];
+				const newPoints = [...points, Number(p)];
+				
+				setElements(newElements);
+				setPoints(newPoints);
 				setCurrentInput('');
+				props.handleElementsChange(newElements, newPoints, props.type);
 			} catch(e) {
 				//TODO better exception handling
 				console.log(e);

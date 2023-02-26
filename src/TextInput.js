@@ -2,13 +2,20 @@ import React, { useState } from 'react';
 
 
 function TextInput(props) {
-    return (
+	const [text, setText] = useState("");
+
+  function handleChange(event){
+    setText(event.target.value)
+    props.handleTextChange(event.target.value, props.type);
+  }
+
+  return (
       <div className='col'>
       <input
           type="text"
-          value={props.duration}
+          value={text}
           data-index={props.index}
-          onChange={props.handleChange}
+          onChange={handleChange}
           style={props.style}
         />
         </div>

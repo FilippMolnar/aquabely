@@ -1,58 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Row from './Row';
 import "./css/styles.css";
 
 function Table() {
-    const [count, setCount] = useState(1);
-    let [durations, setDurations] = useState([0]);
-    let [parts, setParts] = useState([""]);
+    const [data, setData] = useState([
+      {
+        startTime: 0,
+        duration: 0
+      }
+    ]);
 
     function handleAddRow() {
-      setCount(count + 1);
-      setDurations((prev)=>{
-        let n = [...prev, 0];
-        return n;
-      })
-      setParts((prev)=>{
-        let n = [...prev, ""];
-        return n;
-      })
+      setData([...data, {
+        startTime: data[data.length-1].startTime + data[data.length-1].duration +1,
+        duration: 0
+      }]);
+
     }
 
-    function handleDurationChange(event) {
-        let duration = Number(event.target.value);
-        let idx = event.target.dataset.index;
-        let newD = [...durations];
-        newD[idx] = duration;
-        setDurations(newD);
+    function handleRowChange(row, index) {
+      let newData = [...data];
+      newData[Number(index)] = row;
+      setData(newData);
     }
 
-    function handlePartChange(event) {
-        let idx = event.target.dataset.index;
-        let n = [...parts];
-        n[idx] = event.target.value;
-        setParts(n);
-    }
-
-    function calculateStartTime(index) {
-        if(index === 0) return "00:00";
-        let sum = 0;
-        for(let i=0; i<index; i++){
-            sum+=durations[i];
+    function calculateStartTimes() {
+      let newStartTimes = [...data];
+      let sum = 0;
+      for(let i=0; i<newStartTimes.length; i++){
+        if(i === 0){
+          newStartTimes[i].startTime = 0;
+          sum++;
+          sum+=newStartTimes[i].duration;
+          continue;
         }
-        // next row starts with +1 so for every row I add one
-        sum+=index;
-        let m = String(Math.floor(sum/60));
-        let s = String(sum%60);
-        let minutes = m < 10 ? "0"+m : m;
-        let seconds = s < 10 ? "0"+s : s;
-        return minutes + ":" + seconds;
-    }
+        newStartTimes[i].startTime = sum;
+        sum++;
+        sum+=newStartTimes[i].duration;
+      }
+      setData(newStartTimes);
+      console.log("start");
+      for(let i=0; i<data.length; i++){
+        console.log(data[i].startTime);
+      }
 
-    function calculateTotal(){
-        //TODO
-        return 0;
-    }
+  }
+  // useEffect(() => {
+  //   console.log(data)
+  //   // calculateStartTimes();
+  // }, [[data.some(row => row.duration !== row?.durationPrev)]]);
 
     return (
         <div>
@@ -68,18 +64,27 @@ function Table() {
                 <label className='col'>Totals</label>
 
             </div>
-            {Array.from({ length: count }, (_, index) => (
+
+            {Array.from({ length: data.length }, (_, index) => (
                 <Row
                     key={"ROW"+index}
                     id={"row"+index}
                     index={index}
-                    onDurationChange={handleDurationChange}
-                    onPartChange={handlePartChange}
-                    duration={durations[index]}
-                    startTime={calculateStartTime(index)}
-                    total={calculateTotal()}
+                    onRowChange={handleRowChange}
+                    row={data[index]}
+                    start={data[index].startTime}
+                    onDurationChange={calculateStartTimes}
                 />
             ))}
+            {/* {Object.keys(data).map((key) => (
+              <Row
+                key={"ROW" + key}
+                id={"row" + key}
+                index={key}
+                onRowChange={handleRowChange}
+                row={data[key]}
+              />
+            ))} */}
         </div>
     );
 }
